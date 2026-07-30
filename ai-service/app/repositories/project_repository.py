@@ -48,3 +48,39 @@ class ProjectRepository:
           .order_by(Project.id)
           .all()
         )
+       
+       
+    def delete(
+      self,
+      db: Session,
+      project_id: int,
+    ):
+        project = (
+            db.query(Project)
+            .filter(Project.id == project_id)
+            .first()
+        )
+
+        if project:
+            db.delete(project)
+            db.commit()
+        return {"message": "Project deleted"}
+      
+    def rename(
+      self,
+      db: Session,
+      project_id: int,
+      name: str,
+    ):
+        project = (db.query(Project)
+            .filter(Project.id == project_id)
+            .first()
+        )
+
+        if not project:
+            return None
+        project.name = name
+        db.commit()
+        db.refresh(project)
+         
+        return project

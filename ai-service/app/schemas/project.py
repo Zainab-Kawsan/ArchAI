@@ -11,3 +11,6 @@ class ProjectResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+    
+class ProjectRename(BaseModel):
+    name: str

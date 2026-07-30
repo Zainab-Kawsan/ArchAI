@@ -12,6 +12,7 @@ from app.schemas.artifact import ArtifactResponse
 
 from app.repositories.project_repository import ProjectRepository
 from app.schemas.project import ProjectCreate
+from app.schemas.project import ProjectRename
 
 router = APIRouter()
 
@@ -55,5 +56,28 @@ def create_project(
 ):
     return project_repository.create(
         db=db,
+        name=request.name,
+    )
+    
+    
+@router.delete("/projects/{project_id}")
+def delete_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+):
+    return project_repository.delete(
+        db=db,
+        project_id=project_id,
+    )
+    
+@router.put("/projects/{project_id}")
+def rename_project(
+    project_id: int,
+    request: ProjectRename,
+    db: Session = Depends(get_db),
+):
+    return project_repository.rename(
+        db=db,
+        project_id=project_id,
         name=request.name,
     )

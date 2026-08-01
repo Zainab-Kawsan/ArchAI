@@ -60,6 +60,37 @@ export default function Home() {
     versions: 0,
   });
 
+  const loadStatistics = async () => {
+    const res = await api.get("/projects");
+
+    setProjects(res.data);
+
+    let artifactCount = 0;
+    let versionCount = 0;
+
+    for (const project of res.data) {
+      const artifactsRes = await api.get(
+        `/projects/${project.id}/artifacts`
+      );
+
+      artifactCount += artifactsRes.data.length;
+
+      for (const artifact of artifactsRes.data) {
+        const versionsRes = await api.get(
+          `/artifacts/${artifact.id}/versions`
+        );
+
+        versionCount += versionsRes.data.length;
+      }
+    }
+
+    setStats({
+      projects: res.data.length,
+      artifacts: artifactCount,
+      versions: versionCount,
+    });
+  };
+
   useEffect(() => {
     api.get("/projects").then(async (res) => {
 
@@ -86,11 +117,7 @@ export default function Home() {
         }
       }
 
-      setStats({
-        projects: res.data.length,
-        artifacts: artifactCount,
-        versions: versionCount,
-      });
+      loadStatistics();
 
     });
   }, []);
@@ -189,6 +216,7 @@ export default function Home() {
       toast.success("Artifact generated successfully 🎉");
 
       await loadArtifacts(selectedProject);
+      await loadStatistics();
 
       const artifactRes = await api.get(
         `/projects/${selectedProject.id}/artifacts`
@@ -253,6 +281,7 @@ export default function Home() {
         regenerate: true,
       });
       toast.success("New version created 🔄");
+      await loadStatistics();
 
       const versions = await loadVersions(selectedArtifact);
 
@@ -299,6 +328,7 @@ export default function Home() {
       });
 
       toast.success("Project created successfully 🚀");
+      await loadStatistics();
 
     } catch {
 
@@ -316,6 +346,21 @@ export default function Home() {
   };
 
   const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("darkMode");
+
+    if (saved !== null) {
+      setDarkMode(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "darkMode",
+      JSON.stringify(darkMode)
+    );
+  }, [darkMode]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
@@ -404,6 +449,7 @@ export default function Home() {
     await api.delete(
       `/projects/${selectedProject.id}`
     );
+    await loadStatistics();
 
     const res = await api.get("/projects");
 
@@ -532,22 +578,39 @@ export default function Home() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-
-                    setOpenMenu(
-                      openMenu === project.id
-                        ? null
-                        : project.id
-                    );
+                    setOpenMenu(openMenu === project.id ? null : project.id);
                   }}
-                  className="absolute right-3 top-3 rounded p-1 hover:bg-black/10"
+                  className={`
+    absolute right-2 top-2 
+    rounded-lg p-1.5 
+    transition-all duration-200
+    hover:scale-110 active:scale-90
+    ${selectedProject?.id === project.id
+                      ? 'text-white/80 hover:text-white hover:bg-white/20'
+                      : darkMode
+                        ? 'text-gray-500 hover:text-gray-300 hover:bg-[#252832]'
+                        : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+                    }
+  `}
+                  aria-label="Project options"
                 >
                   ⋮
                 </button>
 
                 {openMenu === project.id && (
-
-                  <div className="absolute right-3 top-12 z-50 w-44 rounded-lg border bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-
+                  <div className={`
+    absolute right-2 top-10 
+    z-50 
+    w-48 sm:w-44 
+    rounded-xl 
+    shadow-xl 
+    overflow-hidden
+    animate-in fade-in slide-in-from-top-2 duration-200
+    ${darkMode
+                      ? 'bg-[#1a1c23] border border-[#1e2028]'
+                      : 'bg-white border border-gray-100'
+                    }
+  `}>
                     <button
                       onClick={() => {
                         setSelectedProject(project);
@@ -555,10 +618,22 @@ export default function Home() {
                         setShowRenameModal(true);
                         setOpenMenu(null);
                       }}
-                      className="block w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-zinc-800"
+                      className={`
+        flex items-center gap-3 
+        w-full px-4 py-3 
+        text-sm font-medium 
+        transition-all duration-200
+        ${darkMode
+                          ? 'text-gray-300 hover:bg-[#252832] hover:text-white'
+                          : 'text-gray-700 hover:bg-gray-50'
+                        }
+      `}
                     >
-                      ✏ Rename
+                      <span className="text-base">✏️</span>
+                      Rename
                     </button>
+
+                    <div className={`h-px ${darkMode ? 'bg-[#1e2028]' : 'bg-gray-100'}`} />
 
                     <button
                       onClick={() => {
@@ -566,15 +641,22 @@ export default function Home() {
                         setShowDeleteModal(true);
                         setOpenMenu(null);
                       }}
-                      className="block w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className={`
+        flex items-center gap-3 
+        w-full px-4 py-3 
+        text-sm font-medium 
+        transition-all duration-200
+        ${darkMode
+                          ? 'text-red-400 hover:bg-red-500/10 hover:text-red-300'
+                          : 'text-red-600 hover:bg-red-50'
+                        }
+      `}
                     >
-                      🗑 Delete
+                      <span className="text-base">🗑️</span>
+                      Delete
                     </button>
-
                   </div>
-
                 )}
-
               </div>
             ))}
         </div>

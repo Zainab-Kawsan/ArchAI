@@ -16,8 +16,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     
     DATABASE_URL: str
-    
-    DATABASE_URL: str
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

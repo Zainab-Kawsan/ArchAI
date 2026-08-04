@@ -243,13 +243,13 @@ docker compose up --build
 ## 📸 Screenshots
 
 ### Dashboard
-![Dashboard](assets/home_page.png.png)
+![Dashboard](assets/home_page.png)
 
 ### Versions
 ![Versions](assets/versions.png)
 
 ### Generated Content
-![Content](assets/content.png.png)
+![Content](assets/content.png)
 
 # 🚀 Future Improvements
 

@@ -93,7 +93,7 @@ https://archai-backend-ccgm.onrender.com/docs
 
 
 # 📂 Project Structure
-
+```text
 ArchAI
 │
 ├── ai-service
@@ -120,6 +120,7 @@ ArchAI
 │   └── Dockerfile
 │
 └── docker-compose.yml
+```
 
 
 # 📡 REST API

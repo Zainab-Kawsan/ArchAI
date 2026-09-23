@@ -14,7 +14,9 @@ class GroqProvider(BaseProvider):
     async def generate(self, prompt: str) -> str:
 
         response = self.client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            # model="llama-3.3-70b-versatile",
+            
+            
             messages=[
                 {
                     "role": "user",
@@ -30,7 +32,9 @@ class GroqProvider(BaseProvider):
         try:
 
             self.client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                # model="llama-3.3-70b-versatile",
+                
+                model="openai/gpt-oss-120b",
                 messages=[
                     {
                         "role": "user",
